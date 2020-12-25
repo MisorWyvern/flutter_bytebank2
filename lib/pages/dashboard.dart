@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bytebank02/pages/contact_list.dart';
 import 'package:flutter_bytebank02/widgets/icon_labeled_container.dart';
 
-class HomePage extends StatelessWidget {
+class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +17,15 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.asset("assets/images/bytebank_logo.png"),
-            IconLabeledContainer(text: "Contacts", icon: Icons.people),
+            IconLabeledContainer(
+              text: "Contacts",
+              icon: Icons.people,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => ContactList()),
+                );
+              },
+            ),
           ],
         ),
       ),
