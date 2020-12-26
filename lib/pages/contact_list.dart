@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bytebank02/database/app_database.dart';
+import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/pages/contact_form.dart';
 
-class ContactList extends StatelessWidget {
+class ContactList extends StatefulWidget {
+  @override
+  _ContactListState createState() => _ContactListState();
+}
+
+class _ContactListState extends State<ContactList> {
+  final ContactDAO _contactDAO = ContactDAO();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,19 +22,18 @@ class ContactList extends StatelessWidget {
         onPressed: () {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => ContactForm()))
-              .then((newContact) => debugPrint(newContact));
+              .then((value) => setState(() {}));
         },
         child: Icon(Icons.add),
       ),
       body: FutureBuilder<List<Contact>>(
           initialData: [],
-          future: findAll(),
+          future: _contactDAO.findAll(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
                 break;
-              case ConnectionState.active:
-                break;
+
               case ConnectionState.waiting:
                 return Center(
                   child: Column(
@@ -46,6 +52,8 @@ class ContactList extends StatelessWidget {
                     ],
                   ),
                 );
+                break;
+              case ConnectionState.active:
                 break;
               case ConnectionState.done:
                 final List<Contact> contacts = snapshot.data;
