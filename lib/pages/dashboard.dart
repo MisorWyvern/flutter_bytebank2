@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
+import 'package:flutter_bytebank02/pages/transactions_list.dart';
 import 'package:flutter_bytebank02/widgets/icon_labeled_container.dart';
 
 class Dashboard extends StatelessWidget {
@@ -17,14 +18,34 @@ class Dashboard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.asset("assets/images/bytebank_logo.png"),
-            IconLabeledContainer(
-              text: "Contacts",
-              icon: Icons.people,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => ContactList()),
-                );
-              },
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  IconLabeledContainer(
+                    text: "Transfer",
+                    icon: Icons.monetization_on,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => ContactList()),
+                      );
+                    },
+                  ),
+                  IconLabeledContainer(
+                    text: "Transation Feed",
+                    icon: Icons.description,
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => TransactionsList()));
+                    },
+                  ),
+                  IconLabeledContainer(
+                    text: "Placeholder Container",
+                    icon: Icons.battery_alert,
+                    onTap: () {},
+                  ),
+                ],
+              ),
             ),
           ],
         ),

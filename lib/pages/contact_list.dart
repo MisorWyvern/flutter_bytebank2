@@ -16,7 +16,7 @@ class _ContactListState extends State<ContactList> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text("Contacts"),
+        title: Text("Transfer"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
