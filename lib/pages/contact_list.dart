@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/pages/contact_form.dart';
+import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 
 class ContactList extends StatefulWidget {
   @override
@@ -33,25 +34,8 @@ class _ContactListState extends State<ContactList> {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
                 break;
-
               case ConnectionState.waiting:
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Loading...",
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                return CustomProgressIndicator();
                 break;
               case ConnectionState.active:
                 break;

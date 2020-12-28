@@ -4,7 +4,7 @@ import 'package:flutter_bytebank02/pages/dashboard.dart';
 
 void main() {
   runApp(SecondByteBankApp());
-  findAll();
+  findAll().then((value) => print("Lista: $value"));
 }
 
 class SecondByteBankApp extends StatelessWidget {
