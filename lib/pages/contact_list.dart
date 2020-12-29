@@ -50,7 +50,6 @@ class _ContactListState extends State<ContactList> {
                       onTap: () {
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (context) {
-                          debugPrint(contacts[index].toString());
                           return TransactionForm(contacts[index]);
                         }));
                       },

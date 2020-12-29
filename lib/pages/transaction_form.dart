@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bytebank02/http/webclient.dart';
+import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/models/transaction.dart';
 
 class TransactionForm extends StatefulWidget {
   final Contact contact;
+  final TransactionWebClient _webClient = TransactionWebClient();
 
   TransactionForm(this.contact);
 
@@ -66,7 +67,9 @@ class _TransactionFormState extends State<TransactionForm> {
                           double.tryParse(_valueController.text);
                       final transactionCreated =
                           Transaction(value, widget.contact);
-                      save(transactionCreated).then((transaction) {
+                      widget._webClient
+                          .save(transactionCreated)
+                          .then((transaction) {
                         if (transaction == null) {
                           return;
                         }

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
 import 'package:flutter_bytebank02/models/transaction.dart';
 import 'package:flutter_bytebank02/widgets/centered_message.dart';
 import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 
-import '../http/webclient.dart';
 import '../models/transaction.dart';
 
 class TransactionsList extends StatelessWidget {
+  final TransactionWebClient _webClient = TransactionWebClient();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +16,7 @@ class TransactionsList extends StatelessWidget {
         title: Text('Transactions'),
       ),
       body: FutureBuilder<List<Transaction>>(
-        future: findAll(),
+        future: _webClient.findAll(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -27,7 +28,8 @@ class TransactionsList extends StatelessWidget {
               break;
             case ConnectionState.done:
               if (snapshot.hasData == false) {
-                return CenteredMessage("No data available.", icon: Icons.warning);
+                return CenteredMessage("No data available.",
+                    icon: Icons.warning);
               }
 
               final List<Transaction> transactionsList = snapshot.data;
