@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bytebank02/http/webclient.dart';
+import 'package:flutter_bytebank02/models/contact.dart';
+import 'package:flutter_bytebank02/models/transaction.dart';
 
 class TransactionForm extends StatefulWidget {
   final Contact contact;
@@ -16,6 +19,7 @@ class _TransactionFormState extends State<TransactionForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
         title: Text('New transaction'),
       ),
       body: SingleChildScrollView(
@@ -25,9 +29,10 @@ class _TransactionFormState extends State<TransactionForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                widget.contact.name,
+                widget.contact.name.toUpperCase(),
                 style: TextStyle(
                   fontSize: 24.0,
+                  color: Theme.of(context).textTheme.bodyText1.color,
                 ),
               ),
               Padding(
@@ -35,6 +40,7 @@ class _TransactionFormState extends State<TransactionForm> {
                 child: Text(
                   widget.contact.accountNumber.toString(),
                   style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyText1.color,
                     fontSize: 32.0,
                     fontWeight: FontWeight.bold,
                   ),
@@ -54,10 +60,20 @@ class _TransactionFormState extends State<TransactionForm> {
                 child: SizedBox(
                   width: double.maxFinite,
                   child: RaisedButton(
-                    child: Text('Transfer'), onPressed: () {
-                      final double value = double.tryParse(_valueController.text);
-                      final transactionCreated = Transaction(value, widget.contact);
-                  },
+                    child: Text('Transfer'),
+                    onPressed: () {
+                      final double value =
+                          double.tryParse(_valueController.text);
+                      final transactionCreated =
+                          Transaction(value, widget.contact);
+                      save(transactionCreated).then((transaction) {
+                        if (transaction == null) {
+                          return;
+                        }
+
+                        Navigator.of(context).pop();
+                      });
+                    },
                   ),
                 ),
               )

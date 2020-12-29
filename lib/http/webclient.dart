@@ -9,7 +9,7 @@ import '../models/transaction.dart';
 final Client _client =
     HttpClientWithInterceptor.build(interceptors: [LoggingInterceptor()]);
 
-const String _baseUrl = "http://192.168.1.106:8080/transactions";
+const String _baseUrl = "http://192.168.1.108:8080/transactions";
 
 class LoggingInterceptor implements InterceptorContract {
   @override
@@ -38,15 +38,7 @@ Future<List<Transaction>> findAll() async {
 
   final List<Transaction> transactions = List();
   for (Map<String, dynamic> element in decodedJson) {
-    Transaction transaction = Transaction(
-      element['value'],
-      Contact(
-        0,
-        element['contact']['name'],
-        element['contact']['accountNumber'],
-      ),
-    );
-    transactions.add(transaction);
+    transactions.add(Transaction.toTransaction(element));
   }
 
   return transactions;
@@ -65,5 +57,3 @@ Future<Transaction> save(Transaction transaction) async {
   Map<String, dynamic> json = jsonDecode(response.body);
   return Transaction.toTransaction(json);
 }
-
-
