@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/models/transaction.dart';
+import 'package:flutter_bytebank02/widgets/transaction_auth_dialog.dart';
 
 class TransactionForm extends StatefulWidget {
   final Contact contact;
@@ -63,19 +64,19 @@ class _TransactionFormState extends State<TransactionForm> {
                   child: RaisedButton(
                     child: Text('Transfer'),
                     onPressed: () {
-                      final double value =
-                          double.tryParse(_valueController.text);
-                      final transactionCreated =
-                          Transaction(value, widget.contact);
-                      widget._webClient
-                          .save(transactionCreated)
-                          .then((transaction) {
-                        if (transaction == null) {
-                          return;
-                        }
-
-                        Navigator.of(context).pop();
-                      });
+                      showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return TransactionAuthDialog(
+                              onConfirm: (password) {
+                                final double value =
+                                    double.tryParse(_valueController.text);
+                                final transactionCreated =
+                                    Transaction(value, widget.contact);
+                                _save(transactionCreated, password, context);
+                              },
+                            );
+                          });
                     },
                   ),
                 ),
@@ -85,5 +86,16 @@ class _TransactionFormState extends State<TransactionForm> {
         ),
       ),
     );
+  }
+
+  _save(Transaction transaction, String password, BuildContext context) async {
+    Transaction responseTransaction =
+        await widget._webClient.save(transaction, password);
+
+    if (responseTransaction == null) {
+      return;
+    }
+
+    Navigator.of(context).pop();
   }
 }
