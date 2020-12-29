@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/models/transaction.dart';
+import 'package:flutter_bytebank02/widgets/response_dialog.dart';
 import 'package:flutter_bytebank02/widgets/transaction_auth_dialog.dart';
 
 class TransactionForm extends StatefulWidget {
@@ -90,12 +91,24 @@ class _TransactionFormState extends State<TransactionForm> {
 
   _save(Transaction transaction, String password, BuildContext context) async {
     Transaction responseTransaction =
-        await widget._webClient.save(transaction, password);
+        await widget._webClient.save(transaction, password).catchError(
+      (ex) {
+        showDialog(
+            context: context,
+            builder: (contextDialog) {
+              return FailureDialog(ex.message);
+            });
+      },
+      test: (e) => e is Exception,
+    );
 
-    if (responseTransaction == null) {
-      return;
+    if (responseTransaction != null) {
+      await showDialog(
+          context: context,
+          builder: (contextDialog) {
+            return SuccessDialog("Transaction has succeeded!");
+          });
+      Navigator.of(context).pop();
     }
-
-    Navigator.of(context).pop();
   }
 }
