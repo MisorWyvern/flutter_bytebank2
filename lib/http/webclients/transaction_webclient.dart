@@ -7,8 +7,7 @@ class TransactionWebClient {
   String _baseUrl = "http://192.168.1.108:8080/transactions";
 
   Future<List<Transaction>> findAll() async {
-    final Response response =
-        await client.get(_baseUrl).timeout(Duration(seconds: 5));
+    final Response response = await client.get(_baseUrl);
     final List<dynamic> decodedJson = jsonDecode(response.body);
 
     final List<Transaction> transactions =
@@ -38,10 +37,22 @@ class TransactionWebClient {
   }
 
   void _throwHttpError(int statusCode) =>
-      throw Exception(statusCodeResponses[statusCode]);
+      throw HttpException(statusCodeResponses[statusCode]);
 
   static final Map<int, String> statusCodeResponses = {
     400: "There was an error submitting a transaction...",
     401: "Authentication failed...",
   };
+}
+
+class HttpException implements Exception {
+  final String message;
+
+  HttpException(this.message);
+
+  String toString() {
+    String result = "HttpException";
+    if (message != null) result = "$result: $message";
+    return result;
+  }
 }

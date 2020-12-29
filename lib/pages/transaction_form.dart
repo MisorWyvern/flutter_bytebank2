@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
@@ -90,18 +92,26 @@ class _TransactionFormState extends State<TransactionForm> {
   }
 
   _save(Transaction transaction, String password, BuildContext context) async {
-    Transaction responseTransaction =
-        await widget._webClient.save(transaction, password).catchError(
-      (ex) {
-        showDialog(
-            context: context,
-            builder: (contextDialog) {
-              return FailureDialog(ex.message);
-            });
-      },
-      test: (e) => e is Exception,
-    );
+    Transaction responseTransaction = await widget._webClient
+        .save(transaction, password)
+        .catchError(
+          (ex) => _showFailureDialog(context, message: ex.message),
+          test: (e) => e is HttpException,
+        )
+        .catchError(
+          (ex) => _showFailureDialog(context, message: "Connection timeout..."),
+          test: (e) => e is TimeoutException,
+        )
+        .catchError(
+          (ex) => _showFailureDialog(context),
+          test: (e) => e is Exception,
+        );
 
+    _showSuccessDialog(responseTransaction, context);
+  }
+
+  Future _showSuccessDialog(
+      Transaction responseTransaction, BuildContext context) async {
     if (responseTransaction != null) {
       await showDialog(
           context: context,
@@ -110,5 +120,14 @@ class _TransactionFormState extends State<TransactionForm> {
           });
       Navigator.of(context).pop();
     }
+  }
+
+  _showFailureDialog(BuildContext context,
+      {String message = "Unknown error..."}) {
+    showDialog(
+        context: context,
+        builder: (contextDialog) {
+          return FailureDialog(message);
+        });
   }
 }
