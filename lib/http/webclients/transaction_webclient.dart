@@ -19,6 +19,8 @@ class TransactionWebClient {
     final Map<String, dynamic> transactionMap = Transaction.toJson(transaction);
     final String transactionJson = jsonEncode(transactionMap);
 
+    await Future.delayed(Duration(seconds: 2));
+
     final Response response = await client.post(
       _baseUrl,
       headers: {
@@ -42,6 +44,7 @@ class TransactionWebClient {
   static final Map<int, String> statusCodeResponses = {
     400: "There was an error submitting a transaction...",
     401: "Authentication failed...",
+    409: "Transaction already exists...",
   };
 }
 

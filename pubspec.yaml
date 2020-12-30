@@ -36,6 +36,7 @@ dev_dependencies:
   path:
   http:
   http_interceptor:
+  uuid: ^2.2.2
   
 
 # For information on the generic Dart part of this file, see the

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
@@ -19,6 +21,9 @@ class TransactionForm extends StatefulWidget {
 
 class _TransactionFormState extends State<TransactionForm> {
   final TextEditingController _valueController = TextEditingController();
+  final String transactionId = Uuid().v4();
+
+  bool _showProgressIndicator = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +38,14 @@ class _TransactionFormState extends State<TransactionForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Visibility(
+                visible: _showProgressIndicator,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: CustomProgressIndicator(
+                      message: "Sending transaction..."),
+                ),
+              ),
               Text(
                 widget.contact.name.toUpperCase(),
                 style: TextStyle(
@@ -74,9 +87,10 @@ class _TransactionFormState extends State<TransactionForm> {
                               onConfirm: (password) {
                                 final double value =
                                     double.tryParse(_valueController.text);
-                                final transactionCreated =
-                                    Transaction(value, widget.contact);
+                                final transactionCreated = Transaction(
+                                    transactionId, value, widget.contact);
                                 _save(transactionCreated, password, context);
+                                Navigator.of(context).pop();
                               },
                             );
                           });
@@ -92,6 +106,9 @@ class _TransactionFormState extends State<TransactionForm> {
   }
 
   _save(Transaction transaction, String password, BuildContext context) async {
+    setState(() {
+      _showProgressIndicator = true;
+    });
     Transaction responseTransaction = await widget._webClient
         .save(transaction, password)
         .catchError(
@@ -105,6 +122,11 @@ class _TransactionFormState extends State<TransactionForm> {
         .catchError(
           (ex) => _showFailureDialog(context),
           test: (e) => e is Exception,
+        )
+        .whenComplete(
+          () => setState(() {
+            _showProgressIndicator = false;
+          }),
         );
 
     _showSuccessDialog(responseTransaction, context);
