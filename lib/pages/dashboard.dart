@@ -11,43 +11,52 @@ class Dashboard extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text("Dashboard"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset("assets/images/bytebank_logo.png"),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+      body: LayoutBuilder(
+        builder: (context, viewportConstraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints:
+                BoxConstraints(minHeight: viewportConstraints.maxHeight),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconLabeledContainer(
-                    text: "Transfer",
-                    icon: Icons.monetization_on,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => ContactList()),
-                      );
-                    },
-                  ),
-                  IconLabeledContainer(
-                    text: "Transation Feed",
-                    icon: Icons.description,
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => TransactionsList()));
-                    },
-                  ),
-                  IconLabeledContainer(
-                    text: "Placeholder Container",
-                    icon: Icons.battery_alert,
-                    onTap: () {},
+                  Image.asset("assets/images/bytebank_logo.png"),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        IconLabeledContainer(
+                          text: "Transfer",
+                          icon: Icons.monetization_on,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => ContactList()),
+                            );
+                          },
+                        ),
+                        IconLabeledContainer(
+                          text: "Transaction Feed",
+                          icon: Icons.description,
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => TransactionsList()));
+                          },
+                        ),
+                        IconLabeledContainer(
+                          text: "Placeholder Container",
+                          icon: Icons.battery_alert,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
