@@ -7,8 +7,8 @@ import 'package:flutter_bytebank02/pages/dashboard.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import 'matchers.dart';
-import 'mocks.dart';
+import '../mocks/mocks.dart';
+import 'events.dart';
 
 void main() {
   testWidgets("Should save a contact", (WidgetTester widgetTester) async {
@@ -20,14 +20,8 @@ void main() {
     final dashboard = find.byType(Dashboard);
     expect(dashboard, findsOneWidget);
 
-    final transferContainer = find.byWidgetPredicate((widget) =>
-        iconLabeledContainerMatcher(widget, "Transfer", Icons.monetization_on));
-
-    expect(transferContainer, findsOneWidget);
-
-    //open Transfer Contact List
-    await widgetTester.tap(transferContainer);
-    await widgetTester.pumpAndSettle();
+    //open ContactList
+    await tapOnTransferContainer(widgetTester);
 
     final contactsList = find.byType(ContactList);
     expect(contactsList, findsOneWidget);
@@ -37,7 +31,7 @@ void main() {
     final fabNewContact = find.widgetWithIcon(FloatingActionButton, Icons.add);
     expect(fabNewContact, findsOneWidget);
 
-    //open add New Transfer
+    //open add New Contact
     await widgetTester.tap(fabNewContact);
     await widgetTester.pumpAndSettle();
 
@@ -77,3 +71,4 @@ void main() {
     expect(contactsListBack, findsOneWidget);
   });
 }
+

@@ -47,7 +47,7 @@ class _ContactListState extends State<ContactList> {
                 return ListView.builder(
                   itemCount: contacts.length,
                   itemBuilder: (context, index) {
-                    return _ContactListItem(
+                    return ContactListItem(
                       contact: contacts[index],
                       onTap: () {
                         Navigator.of(context)
@@ -66,11 +66,11 @@ class _ContactListState extends State<ContactList> {
   }
 }
 
-class _ContactListItem extends StatelessWidget {
+class ContactListItem extends StatelessWidget {
   final Contact contact;
   final Function onTap;
 
-  const _ContactListItem(
+  const ContactListItem(
       {Key key, @required this.contact, @required this.onTap})
       : super(key: key);
 
