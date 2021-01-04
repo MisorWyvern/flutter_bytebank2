@@ -6,12 +6,14 @@ import 'package:flutter_bytebank02/pages/transaction_form.dart';
 import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 
 class ContactList extends StatefulWidget {
+  final ContactDAO contactDAO;
+
+  const ContactList({Key key, @required this.contactDAO}) : super(key: key);
   @override
   _ContactListState createState() => _ContactListState();
 }
 
 class _ContactListState extends State<ContactList> {
-  final ContactDAO _contactDAO = ContactDAO();
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +25,14 @@ class _ContactListState extends State<ContactList> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => ContactForm()))
+              .push(MaterialPageRoute(builder: (context) => ContactForm(contactDAO: widget.contactDAO,)))
               .then((value) => setState(() {}));
         },
         child: Icon(Icons.add),
       ),
       body: FutureBuilder<List<Contact>>(
           initialData: [],
-          future: _contactDAO.findAll(),
+          future: widget.contactDAO.findAll(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
