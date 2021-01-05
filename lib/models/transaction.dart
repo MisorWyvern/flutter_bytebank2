@@ -37,4 +37,14 @@ class Transaction {
     );
     return transaction;
   }
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is Transaction && o.value == value && o.contact == contact;
+  }
+
+  @override
+  int get hashCode => value.hashCode ^ contact.hashCode;
 }

@@ -11,10 +11,19 @@ import '../mocks/mocks.dart';
 import 'events.dart';
 
 void main() {
+  // ignore: unused_local_variable
+  MockContactDAO mockContactDAO;
+  MockTransactionWebClient mockTransactionWebClient;
+
+  setUp(() async {
+    mockContactDAO = MockContactDAO();
+    mockTransactionWebClient = MockTransactionWebClient();
+  });
+
   testWidgets("Should save a contact", (WidgetTester widgetTester) async {
-    final MockContactDAO mockContactDAO = MockContactDAO();
     await widgetTester.pumpWidget(SecondByteBankApp(
       contactDAO: mockContactDAO,
+      transactionWebClient: mockTransactionWebClient,
     ));
 
     final dashboard = find.byType(Dashboard);
@@ -28,41 +37,17 @@ void main() {
 
     verify(mockContactDAO.findAll()).called(1);
 
-    final fabNewContact = find.widgetWithIcon(FloatingActionButton, Icons.add);
-    expect(fabNewContact, findsOneWidget);
-
-    //open add New Contact
-    await widgetTester.tap(fabNewContact);
-    await widgetTester.pumpAndSettle();
+    await findAndtapOnFABWithIcon(widgetTester, Icons.add);
 
     final contactForm = find.byType(ContactForm);
     expect(contactForm, findsOneWidget);
 
-    final nameTextField = find.byWidgetPredicate(
-      (widget) =>
-          widget is TextField && widget.decoration.labelText == "Full Name",
-      description: "TextField Full Name",
-    );
-    expect(nameTextField, findsOneWidget);
+    await findAndEnterTextOnTextField(widgetTester, "Exemplo", "Full Name",
+        textFieldDescription: "TextField Full Name");
+    await findAndEnterTextOnTextField(widgetTester, "1234", "Account Number",
+        textFieldDescription: "TextField AccountNumber");
 
-    final accountNumberTextField = find.byWidgetPredicate(
-      (widget) =>
-          widget is TextField &&
-          widget.decoration.labelText == "Account Number",
-      description: "TextField AccountNumber",
-    );
-    expect(accountNumberTextField, findsOneWidget);
-
-    await widgetTester.enterText(nameTextField, "Exemplo");
-    await widgetTester.enterText(accountNumberTextField, "1234");
-
-    var createButton =
-        find.widgetWithText(RaisedButton, "Create".toUpperCase());
-    expect(createButton, findsOneWidget);
-
-    //saves contact and back to ContactList
-    await widgetTester.tap(createButton);
-    await widgetTester.pumpAndSettle();
+    await findAndTapRaisedButtonWithText(widgetTester, "Create".toUpperCase());
 
     verify(mockContactDAO.save(Contact(0, "Exemplo", 1234)));
     verify(mockContactDAO.findAll()).called(1);
@@ -71,4 +56,3 @@ void main() {
     expect(contactsListBack, findsOneWidget);
   });
 }
-

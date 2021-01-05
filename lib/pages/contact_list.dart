@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/pages/contact_form.dart';
 import 'package:flutter_bytebank02/pages/transaction_form.dart';
+import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
 import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 
 class ContactList extends StatefulWidget {
-  final ContactDAO contactDAO;
-
-  const ContactList({Key key, @required this.contactDAO}) : super(key: key);
-  @override
   _ContactListState createState() => _ContactListState();
 }
 
 class _ContactListState extends State<ContactList> {
-
   @override
   Widget build(BuildContext context) {
+    final AppDependencies dependencies = AppDependencies.of(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
@@ -25,14 +21,16 @@ class _ContactListState extends State<ContactList> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => ContactForm(contactDAO: widget.contactDAO,)))
+              .push(MaterialPageRoute(
+                builder: (context) => ContactForm(),
+              ))
               .then((value) => setState(() {}));
         },
         child: Icon(Icons.add),
       ),
       body: FutureBuilder<List<Contact>>(
           initialData: [],
-          future: widget.contactDAO.findAll(),
+          future: dependencies.contactDAO.findAll(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
@@ -70,8 +68,7 @@ class ContactListItem extends StatelessWidget {
   final Contact contact;
   final Function onTap;
 
-  const ContactListItem(
-      {Key key, @required this.contact, @required this.onTap})
+  const ContactListItem({Key key, @required this.contact, @required this.onTap})
       : super(key: key);
 
   @override

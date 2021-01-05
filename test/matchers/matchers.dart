@@ -7,3 +7,7 @@ bool iconLabeledContainerMatcher(Widget widget, String text, IconData icon) {
   }
   return false;
 }
+
+bool textFieldByLabelTextMatcher(Widget widget, String labelText) {
+  return widget is TextField && widget.decoration.labelText == labelText;
+}

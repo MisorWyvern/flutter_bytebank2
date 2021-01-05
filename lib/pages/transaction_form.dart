@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
 import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,6 @@ import 'package:flutter_bytebank02/widgets/transaction_auth_dialog.dart';
 
 class TransactionForm extends StatefulWidget {
   final Contact contact;
-  final TransactionWebClient _webClient = TransactionWebClient();
 
   TransactionForm(this.contact);
 
@@ -27,6 +27,7 @@ class _TransactionFormState extends State<TransactionForm> {
 
   @override
   Widget build(BuildContext context) {
+    final AppDependencies dependencies = AppDependencies.of(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
@@ -89,7 +90,8 @@ class _TransactionFormState extends State<TransactionForm> {
                                     double.tryParse(_valueController.text);
                                 final transactionCreated = Transaction(
                                     transactionId, value, widget.contact);
-                                _save(transactionCreated, password, context);
+                                _save(dependencies.transactionWebClient,
+                                    transactionCreated, password, context);
                                 Navigator.of(context).pop();
                               },
                             );
@@ -105,11 +107,12 @@ class _TransactionFormState extends State<TransactionForm> {
     );
   }
 
-  _save(Transaction transaction, String password, BuildContext context) async {
+  _save(TransactionWebClient webClient, Transaction transaction,
+      String password, BuildContext context) async {
     setState(() {
       _showProgressIndicator = true;
     });
-    Transaction responseTransaction = await widget._webClient
+    Transaction responseTransaction = await webClient
         .save(transaction, password)
         .catchError(
           (ex) => _showFailureDialog(context, message: ex.message),
