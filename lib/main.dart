@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
 import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
-import 'package:flutter_bytebank02/pages/name_page.dart';
+import 'package:flutter_bytebank02/pages/dashboard.dart';
 import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
 import 'package:flutter_bytebank02/widgets/theme.dart';
 
@@ -30,7 +30,7 @@ class SecondByteBankApp extends StatelessWidget {
       child: MaterialApp(
         title: 'ByteBank',
         theme: baitBankTheme,
-        home: NameContainer(),
+        home: DashboardContainer(),
       ),
     );
   }

@@ -2,16 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bytebank02/models/cubits/name_cubit.dart';
 
-class NameContainer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => NameCubit("Exemplo"),
-      child: NamePage(),
-    );
-  }
-}
-
 class NamePage extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   @override
@@ -30,9 +20,9 @@ class NamePage extends StatelessWidget {
               decoration: InputDecoration(labelText: "Desired name"),
             ),
             RaisedButton(
-              onPressed: (){
+              onPressed: () {
                 String name = _nameController.text;
-                if(name == null || name == "") return;
+                if (name == null || name == "") return;
 
                 context.read<NameCubit>().rename(name);
                 Navigator.of(context).pop();

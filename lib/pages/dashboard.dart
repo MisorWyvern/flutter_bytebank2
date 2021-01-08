@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bytebank02/models/cubits/name_cubit.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
 import 'package:flutter_bytebank02/pages/transactions_list.dart';
 import 'package:flutter_bytebank02/widgets/icon_labeled_container.dart';
 
+import 'name_page.dart';
+
+class DashboardContainer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => NameCubit("Exemplo"),
+      child: Dashboard(),
+    );
+  }
+}
+
 class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final String name = BlocProvider.of<NameCubit>(context, listen: true).state;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text("Dashboard"),
+        title: Text("Welcome $name"),
       ),
       body: LayoutBuilder(
         builder: (context, viewportConstraints) => SingleChildScrollView(
@@ -31,24 +46,22 @@ class Dashboard extends StatelessWidget {
                           text: "Transfer",
                           icon: Icons.monetization_on,
                           onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => ContactList()),
-                            );
+                            _showContactListPage(context);
                           },
                         ),
                         IconLabeledContainer(
                           text: "Transaction Feed",
                           icon: Icons.description,
                           onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => TransactionsList()));
+                            _showTransactionListPage(context);
                           },
                         ),
                         IconLabeledContainer(
-                          text: "Placeholder Container",
-                          icon: Icons.battery_alert,
-                          onTap: () {},
+                          text: "Change Name",
+                          icon: Icons.person_outline,
+                          onTap: () {
+                            _showNamePage(context);
+                          },
                         ),
                       ],
                     ),
@@ -60,5 +73,29 @@ class Dashboard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showNamePage(BuildContext blocContext) {
+    Navigator.of(blocContext).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return BlocProvider.value(
+            value: BlocProvider.of<NameCubit>(blocContext),
+            child: NamePage(),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showContactListPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => ContactList()),
+    );
+  }
+
+  void _showTransactionListPage(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => TransactionsList()));
   }
 }
