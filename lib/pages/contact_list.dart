@@ -6,7 +6,6 @@ import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/models/cubits/contact_list_cubit.dart';
 import 'package:flutter_bytebank02/pages/contact_form.dart';
 import 'package:flutter_bytebank02/pages/transaction_form.dart';
-import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
 import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 
 class ContactListContainer extends BlocContainer {
@@ -58,7 +57,7 @@ class ContactList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppDependencies dependencies = AppDependencies.of(context);
+    //final AppDependencies dependencies = AppDependencies.of(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,

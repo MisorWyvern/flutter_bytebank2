@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
 import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
 import 'package:flutter_bytebank02/pages/dashboard.dart';
@@ -10,6 +11,14 @@ void main() {
     contactDAO: ContactDAO(),
     transactionWebClient: TransactionWebClient(),
   ));
+}
+
+class LogObserver extends BlocObserver {
+  @override
+  void onChange(Cubit cubit, Change change) {
+    debugPrint("${cubit.runtimeType} > $change");
+    super.onChange(cubit, change);
+  }
 }
 
 class SecondByteBankApp extends StatelessWidget {
@@ -24,6 +33,7 @@ class SecondByteBankApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Bloc.observer = LogObserver();
     return AppDependencies(
       contactDAO: contactDAO,
       transactionWebClient: transactionWebClient,
