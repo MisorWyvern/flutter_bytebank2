@@ -89,10 +89,7 @@ class ContactList extends StatelessWidget {
                 return ContactListItem(
                   contact: contacts[index],
                   onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return TransactionForm(contacts[index]);
-                    }));
+                    push(context, TransactionFormContainer(contacts[index]));
                   },
                 );
               },

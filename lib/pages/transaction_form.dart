@@ -1,30 +1,104 @@
-import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
+import 'package:flutter_bytebank02/models/bloc_container.dart';
+import 'package:flutter_bytebank02/models/contact.dart';
+import 'package:flutter_bytebank02/models/cubits/transaction_form_cubit.dart';
+import 'package:flutter_bytebank02/models/transaction.dart';
 import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
 import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
-import 'package:uuid/uuid.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
-import 'package:flutter_bytebank02/models/contact.dart';
-import 'package:flutter_bytebank02/models/transaction.dart';
-import 'package:flutter_bytebank02/widgets/response_dialog.dart';
 import 'package:flutter_bytebank02/widgets/transaction_auth_dialog.dart';
 
-class TransactionForm extends StatefulWidget {
+@immutable
+abstract class TransactionFormState {
+  const TransactionFormState();
+}
+
+@immutable
+class SendingState extends TransactionFormState {
+  const SendingState();
+}
+
+@immutable
+class SentState extends TransactionFormState {
+  const SentState();
+}
+
+@immutable
+class ShowFormState extends TransactionFormState {
+  const ShowFormState();
+}
+
+@immutable
+class FatalErrorState extends TransactionFormState {
+  final String message;
+  const FatalErrorState(this.message);
+}
+
+class TransactionFormContainer extends BlocContainer {
+  final Contact _contact;
+  TransactionFormContainer(this._contact);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<TransactionFormCubit>(
+      create: (context) => TransactionFormCubit(),
+      child: TransactionForm(_contact),
+    );
+  }
+}
+
+class TransactionForm extends StatelessWidget {
   final Contact contact;
 
   TransactionForm(this.contact);
 
   @override
-  _TransactionFormState createState() => _TransactionFormState();
+  Widget build(BuildContext context) {
+    return BlocBuilder<TransactionFormCubit, TransactionFormState>(
+      builder: (context, state) {
+        if (state is ShowFormState) {
+          return _TransactionForm(contact);
+        }
+
+        if (state is SendingState) {
+          return _TransactionProgressIndicator();
+        }
+
+        if (state is FatalErrorState) {
+          return _AlertPage(
+            message: state.message,
+            icon: Icons.warning,
+            iconColor: Colors.red,
+          );
+        }
+
+        if (state is SentState) {
+          return _AlertPage(
+            message: "Transaction has succeeded!",
+            icon: Icons.check_circle_rounded,
+            iconColor: Theme.of(context).primaryColor,
+          );
+        }
+
+        return _AlertPage(
+          message: "Unknown Error...",
+          icon: Icons.warning,
+          iconColor: Colors.red,
+        );
+      },
+    );
+  }
 }
 
-class _TransactionFormState extends State<TransactionForm> {
+class _TransactionForm extends StatelessWidget {
+  final Contact contact;
+
+  _TransactionForm(this.contact);
+
   final TextEditingController _valueController = TextEditingController();
   final String transactionId = Uuid().v4();
-
-  bool _showProgressIndicator = false;
-
   @override
   Widget build(BuildContext context) {
     final AppDependencies dependencies = AppDependencies.of(context);
@@ -39,16 +113,8 @@ class _TransactionFormState extends State<TransactionForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Visibility(
-                visible: _showProgressIndicator,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: CustomProgressIndicator(
-                      message: "Sending transaction..."),
-                ),
-              ),
               Text(
-                widget.contact.name.toUpperCase(),
+                contact.name.toUpperCase(),
                 style: TextStyle(
                   fontSize: 24.0,
                   color: Theme.of(context).textTheme.bodyText1.color,
@@ -57,7 +123,7 @@ class _TransactionFormState extends State<TransactionForm> {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Text(
-                  widget.contact.accountNumber.toString(),
+                  contact.accountNumber.toString(),
                   style: TextStyle(
                     color: Theme.of(context).textTheme.bodyText1.color,
                     fontSize: 32.0,
@@ -88,11 +154,23 @@ class _TransactionFormState extends State<TransactionForm> {
                               onConfirm: (password) {
                                 final double value =
                                     double.tryParse(_valueController.text);
-                                final transactionCreated = Transaction(
-                                    transactionId, value, widget.contact);
-                                _save(dependencies.transactionWebClient,
-                                    transactionCreated, password, context);
-                                Navigator.of(context).pop();
+
+                                try {
+                                  final transactionCreated = Transaction(
+                                      transactionId, value, contact);
+
+                                  BlocProvider.of<TransactionFormCubit>(context)
+                                      .save(
+                                          dependencies.transactionWebClient,
+                                          transactionCreated,
+                                          password,
+                                          context);
+                                } catch (ex) {
+                                  BlocProvider.of<TransactionFormCubit>(context)
+                                      .throwError("Invalid Value");
+                                } finally {
+                                  Navigator.of(context).pop();
+                                }
                               },
                             );
                           });
@@ -106,53 +184,67 @@ class _TransactionFormState extends State<TransactionForm> {
       ),
     );
   }
+}
 
-  _save(TransactionWebClient webClient, Transaction transaction,
-      String password, BuildContext context) async {
-    setState(() {
-      _showProgressIndicator = true;
-    });
-    Transaction responseTransaction = await webClient
-        .save(transaction, password)
-        .catchError(
-          (ex) => _showFailureDialog(context, message: ex.message),
-          test: (e) => e is HttpException,
-        )
-        .catchError(
-          (ex) => _showFailureDialog(context, message: "Connection timeout..."),
-          test: (e) => e is TimeoutException,
-        )
-        .catchError(
-          (ex) => _showFailureDialog(context),
-          test: (e) => e is Exception,
-        )
-        .whenComplete(
-          () => setState(() {
-            _showProgressIndicator = false;
-          }),
-        );
-
-    _showSuccessDialog(responseTransaction, context);
+class _TransactionProgressIndicator extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text('New transaction'),
+      ),
+      body: CustomProgressIndicator(message: "Sending transaction..."),
+    );
   }
+}
 
-  Future _showSuccessDialog(
-      Transaction responseTransaction, BuildContext context) async {
-    if (responseTransaction != null) {
-      await showDialog(
-          context: context,
-          builder: (contextDialog) {
-            return SuccessDialog("Transaction has succeeded!");
-          });
-      Navigator.of(context).pop();
-    }
-  }
+class _AlertPage extends StatelessWidget {
+  final String title;
+  final String message;
+  final String buttonText;
+  final IconData icon;
+  final Color iconColor;
+  _AlertPage({
+    Key key,
+    this.title = "New Transaction",
+    this.message = "Error...",
+    this.buttonText = "Ok",
+    this.icon,
+    this.iconColor,
+  }) : super(key: key);
 
-  _showFailureDialog(BuildContext context,
-      {String message = "Unknown error..."}) {
-    showDialog(
-        context: context,
-        builder: (contextDialog) {
-          return FailureDialog(message);
-        });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 64,
+              color: iconColor,
+            ),
+            Text(
+              message,
+              style: TextStyle(
+                  fontSize:
+                      Theme.of(context).textTheme.bodyText1.fontSize * 1.5,
+                  color: Theme.of(context).textTheme.bodyText1.color),
+              textAlign: TextAlign.center,
+            ),
+            RaisedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(buttonText.toUpperCase()),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
