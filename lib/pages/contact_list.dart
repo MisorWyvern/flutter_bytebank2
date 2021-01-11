@@ -1,15 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
+import 'package:flutter_bytebank02/models/bloc_container.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
+import 'package:flutter_bytebank02/models/cubits/contact_list_cubit.dart';
 import 'package:flutter_bytebank02/pages/contact_form.dart';
 import 'package:flutter_bytebank02/pages/transaction_form.dart';
 import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
 import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 
-class ContactList extends StatefulWidget {
-  _ContactListState createState() => _ContactListState();
+class ContactListContainer extends BlocContainer {
+  @override
+  Widget build(BuildContext context) {
+    final ContactDAO dao = ContactDAO();
+    return BlocProvider<ContactListCubit>(
+      create: (BuildContext context) {
+        final cubit = ContactListCubit();
+        cubit.reload(dao);
+        return cubit;
+      },
+      child: ContactList(dao),
+    );
+  }
 }
 
-class _ContactListState extends State<ContactList> {
+@immutable
+abstract class ContactListState {
+  const ContactListState();
+}
+
+@immutable
+class InitContactListState extends ContactListState {
+  const InitContactListState();
+}
+
+@immutable
+class LoadingContactListState extends ContactListState {
+  const LoadingContactListState();
+}
+
+@immutable
+class LoadedContactListState extends ContactListState {
+  final List<Contact> _contactList;
+  const LoadedContactListState(this._contactList)
+      : assert(_contactList != null);
+}
+
+@immutable
+class FatalErrorContactListState extends ContactListState {
+  const FatalErrorContactListState();
+}
+
+class ContactList extends StatelessWidget {
+  final ContactDAO _dao;
+
+  const ContactList(this._dao, {Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final AppDependencies dependencies = AppDependencies.of(context);
@@ -19,48 +65,49 @@ class _ContactListState extends State<ContactList> {
         title: Text("Transfer"),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(
-                builder: (context) => ContactForm(),
-              ))
-              .then((value) => setState(() {}));
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ContactForm(),
+            ),
+          );
+          update(context);
         },
         child: Icon(Icons.add),
       ),
-      body: FutureBuilder<List<Contact>>(
-          initialData: [],
-          future: dependencies.contactDAO.findAll(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-                break;
-              case ConnectionState.waiting:
-                return CustomProgressIndicator();
-                break;
-              case ConnectionState.active:
-                break;
-              case ConnectionState.done:
-                final List<Contact> contacts = snapshot.data;
-                return ListView.builder(
-                  itemCount: contacts.length,
-                  itemBuilder: (context, index) {
-                    return ContactListItem(
-                      contact: contacts[index],
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return TransactionForm(contacts[index]);
-                        }));
-                      },
-                    );
+      body: BlocBuilder<ContactListCubit, ContactListState>(
+        builder: (BuildContext context, state) {
+          if (state is InitContactListState ||
+              state is LoadingContactListState) {
+            return CustomProgressIndicator();
+          }
+
+          if (state is LoadedContactListState) {
+            final List<Contact> contacts = state._contactList;
+            return ListView.builder(
+              itemCount: contacts.length,
+              itemBuilder: (context, index) {
+                return ContactListItem(
+                  contact: contacts[index],
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return TransactionForm(contacts[index]);
+                    }));
                   },
                 );
-                break;
-            }
-            return Text("Erro.");
-          }),
+              },
+            );
+          }
+
+          return const Text("Erro.");
+        },
+      ),
     );
+  }
+
+  void update(BuildContext context) {
+    context.read<ContactListCubit>().reload(_dao);
   }
 }
 

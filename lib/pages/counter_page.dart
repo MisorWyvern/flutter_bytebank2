@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bytebank02/models/bloc_container.dart';
 
 class CounterCubit extends Cubit<int> {
   CounterCubit() : super(0);
@@ -9,7 +9,7 @@ class CounterCubit extends Cubit<int> {
   void decrement() => emit(state - 1);
 }
 
-class CounterContainer extends StatelessWidget {
+class CounterContainer extends BlocContainer {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -18,13 +18,18 @@ class CounterContainer extends StatelessWidget {
     );
   }
 }
+
 class CounterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Counter')),
       body: BlocBuilder<CounterCubit, int>(
-        builder: (context, count) => Center(child: Text('$count', style: Theme.of(context).textTheme.headline2,)),
+        builder: (context, count) => Center(
+            child: Text(
+          '$count',
+          style: Theme.of(context).textTheme.headline2,
+        )),
       ),
       floatingActionButton: Column(
         crossAxisAlignment: CrossAxisAlignment.end,

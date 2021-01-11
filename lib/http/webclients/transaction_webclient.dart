@@ -4,7 +4,7 @@ import 'package:http/http.dart';
 import 'package:flutter_bytebank02/models/transaction.dart';
 
 class TransactionWebClient {
-  String _baseUrl = "http://192.168.1.104:8080/transactions";
+  String _baseUrl = "http://192.168.1.108:8080/transactions";
 
   Future<List<Transaction>> findAll() async {
     final Response response = await client.get(_baseUrl);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bytebank02/models/bloc_container.dart';
 import 'package:flutter_bytebank02/models/cubits/name_cubit.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
 import 'package:flutter_bytebank02/pages/transactions_list.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_bytebank02/widgets/icon_labeled_container.dart';
 
 import 'name_page.dart';
 
-class DashboardContainer extends StatelessWidget {
+class DashboardContainer extends BlocContainer {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -88,10 +89,8 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  void _showContactListPage(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => ContactList()),
-    );
+  void _showContactListPage(BuildContext blocContext) {
+    push(blocContext, ContactListContainer());
   }
 
   void _showTransactionListPage(BuildContext context) {
