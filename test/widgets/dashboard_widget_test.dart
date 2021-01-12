@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
-import 'package:flutter_bytebank02/pages/dashboard.dart';
+import 'package:flutter_bytebank02/pages/dashboard_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../matchers/matchers.dart';
@@ -59,7 +59,7 @@ void main() {
 Future _pumpDashboard(WidgetTester widgetTester, ContactDAO contactDAO) async {
   await widgetTester.pumpWidget(
     MaterialApp(
-      home: Dashboard(),
+      home: DashboardPage(),
     ),
   );
 }

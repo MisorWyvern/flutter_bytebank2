@@ -14,15 +14,19 @@ class DashboardContainer extends BlocContainer {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => NameCubit("Exemplo"),
-      child: Dashboard(),
+      child: I18NLoadingContainer(
+        (messages) => DashboardPage(DashboardPageLazyI18N(messages)),
+      ),
     );
   }
 }
 
-class Dashboard extends StatelessWidget {
+class DashboardPage extends StatelessWidget {
+  final DashboardPageLazyI18N _i18n;
+  DashboardPage(this._i18n);
+
   @override
   Widget build(BuildContext context) {
-    final i18n = DashboardPageI18N(context);
     final String name = BlocProvider.of<NameCubit>(context, listen: true).state;
     return Scaffold(
       appBar: AppBar(
@@ -46,21 +50,21 @@ class Dashboard extends StatelessWidget {
                     child: Row(
                       children: [
                         IconLabeledContainer(
-                          text: i18n.transfer,
+                          text: _i18n.transfer,
                           icon: Icons.monetization_on,
                           onTap: () {
                             _showContactListPage(context);
                           },
                         ),
                         IconLabeledContainer(
-                          text: i18n.transaction_feed,
+                          text: _i18n.transactionFeed,
                           icon: Icons.description,
                           onTap: () {
                             _showTransactionListPage(context);
                           },
                         ),
                         IconLabeledContainer(
-                          text: i18n.change_name,
+                          text: _i18n.changeName,
                           icon: Icons.person_outline,
                           onTap: () {
                             _showNamePage(context);
@@ -101,33 +105,26 @@ class Dashboard extends StatelessWidget {
   }
 }
 
-class DashboardPageI18N extends PageI18N {
-  DashboardPageI18N(BuildContext context) : super(context);
+class DashboardPageLazyI18N {
+  final I18NMessages _messages;
+  DashboardPageLazyI18N(this._messages);
 
-  String get transfer => localize({
-        "pt-br": "Transferência",
-        "en-us": "Transfer",
-      });
+  String get transfer => _messages.get("transfer");
 
-  String get transaction_feed => localize({
-        "pt-br": "Transações",
-        "en-us": "Transaction Feed",
-      });
+  String get transactionFeed => _messages.get("transaction_feed");
 
-  String get change_name => localize({
-        "pt-br": "Alterar Nome",
-        "en-us": "Change Name",
-      });
+  String get changeName => _messages.get("change_name");
 }
 
-class PageI18N {
-  String _language;
-
-  PageI18N(BuildContext context) {
-    this._language = BlocProvider.of<CurrentLocaleCubit>(context).state;
-  }
-
-  String localize(Map<String, String> values) {
-    return values[_language];
-  }
-}
+// ({
+//       "pt-br": "Transferência",
+//       "en-us": "Transfer",
+//     });
+//  localize({
+// "pt-br": "Transações",
+// "en-us": "Transaction Feed",
+//     });
+// localize({
+//       "pt-br": "Alterar Nome",
+//       "en-us": "Change Name",
+//     });

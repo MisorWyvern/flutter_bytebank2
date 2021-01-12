@@ -3,7 +3,7 @@ import 'package:flutter_bytebank02/main.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/pages/contact_form.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
-import 'package:flutter_bytebank02/pages/dashboard.dart';
+import 'package:flutter_bytebank02/pages/dashboard_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
@@ -26,7 +26,7 @@ void main() {
       transactionWebClient: mockTransactionWebClient,
     ));
 
-    final dashboard = find.byType(Dashboard);
+    final dashboard = find.byType(DashboardPage);
     expect(dashboard, findsOneWidget);
 
     //open ContactList

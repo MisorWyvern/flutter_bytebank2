@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:flutter_bytebank02/models/bloc_container.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/models/cubits/transaction_form_cubit.dart';
 import 'package:flutter_bytebank02/models/transaction.dart';
+import 'package:flutter_bytebank02/pages/progress_indicator_page.dart';
 import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
-import 'package:flutter_bytebank02/widgets/custom_progress_indicator.dart';
 import 'package:flutter_bytebank02/widgets/transaction_auth_dialog.dart';
+import 'package:uuid/uuid.dart';
+
+import 'alert_page.dart';
 
 @immutable
 abstract class TransactionFormState {
@@ -63,29 +64,26 @@ class TransactionForm extends StatelessWidget {
         }
 
         if (state is SendingState) {
-          return _TransactionProgressIndicator();
+          return ProgressIndicatorPage(
+              title: "New Transaction", message: "Sending Transaction...");
         }
 
         if (state is FatalErrorState) {
-          return _AlertPage(
+          return AlertPage(
             message: state.message,
-            icon: Icons.warning,
-            iconColor: Colors.red,
           );
         }
 
         if (state is SentState) {
-          return _AlertPage(
+          return AlertPage(
             message: "Transaction has succeeded!",
             icon: Icons.check_circle_rounded,
             iconColor: Theme.of(context).primaryColor,
           );
         }
 
-        return _AlertPage(
+        return AlertPage(
           message: "Unknown Error...",
-          icon: Icons.warning,
-          iconColor: Colors.red,
         );
       },
     );
@@ -180,69 +178,6 @@ class _TransactionForm extends StatelessWidget {
               )
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TransactionProgressIndicator extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text('New transaction'),
-      ),
-      body: CustomProgressIndicator(message: "Sending transaction..."),
-    );
-  }
-}
-
-class _AlertPage extends StatelessWidget {
-  final String title;
-  final String message;
-  final String buttonText;
-  final IconData icon;
-  final Color iconColor;
-  _AlertPage({
-    Key key,
-    this.title = "New Transaction",
-    this.message = "Error...",
-    this.buttonText = "Ok",
-    this.icon,
-    this.iconColor,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text(title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 64,
-              color: iconColor,
-            ),
-            Text(
-              message,
-              style: TextStyle(
-                  fontSize:
-                      Theme.of(context).textTheme.bodyText1.fontSize * 1.5,
-                  color: Theme.of(context).textTheme.bodyText1.color),
-              textAlign: TextAlign.center,
-            ),
-            RaisedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(buttonText.toUpperCase()),
-            )
-          ],
         ),
       ),
     );

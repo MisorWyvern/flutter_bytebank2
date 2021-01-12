@@ -3,7 +3,7 @@ import 'package:flutter_bytebank02/main.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/models/transaction.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
-import 'package:flutter_bytebank02/pages/dashboard.dart';
+import 'package:flutter_bytebank02/pages/dashboard_page.dart';
 import 'package:flutter_bytebank02/pages/transaction_form.dart';
 import 'package:flutter_bytebank02/widgets/response_dialog.dart';
 import 'package:flutter_bytebank02/widgets/transaction_auth_dialog.dart';
@@ -25,7 +25,7 @@ void main() {
         contactDAO: mockContactDAO,
       ));
 
-      final dashboard = find.byType(Dashboard);
+      final dashboard = find.byType(DashboardPage);
       expect(dashboard, findsOneWidget);
 
       final Contact testContact = Contact(0, 'Exemplo', 1000);
