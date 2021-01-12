@@ -5,6 +5,7 @@ import 'package:flutter_bytebank02/models/cubits/name_cubit.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
 import 'package:flutter_bytebank02/pages/transactions_list.dart';
 import 'package:flutter_bytebank02/widgets/icon_labeled_container.dart';
+import 'package:flutter_bytebank02/widgets/localization.dart';
 
 import 'name_page.dart';
 
@@ -21,6 +22,7 @@ class DashboardContainer extends BlocContainer {
 class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final i18n = DashboardPageI18N(context);
     final String name = BlocProvider.of<NameCubit>(context, listen: true).state;
     return Scaffold(
       appBar: AppBar(
@@ -44,21 +46,21 @@ class Dashboard extends StatelessWidget {
                     child: Row(
                       children: [
                         IconLabeledContainer(
-                          text: "Transfer",
+                          text: i18n.transfer,
                           icon: Icons.monetization_on,
                           onTap: () {
                             _showContactListPage(context);
                           },
                         ),
                         IconLabeledContainer(
-                          text: "Transaction Feed",
+                          text: i18n.transaction_feed,
                           icon: Icons.description,
                           onTap: () {
                             _showTransactionListPage(context);
                           },
                         ),
                         IconLabeledContainer(
-                          text: "Change Name",
+                          text: i18n.change_name,
                           icon: Icons.person_outline,
                           onTap: () {
                             _showNamePage(context);
@@ -96,5 +98,36 @@ class Dashboard extends StatelessWidget {
   void _showTransactionListPage(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => TransactionsList()));
+  }
+}
+
+class DashboardPageI18N extends PageI18N {
+  DashboardPageI18N(BuildContext context) : super(context);
+
+  String get transfer => localize({
+        "pt-br": "Transferência",
+        "en-us": "Transfer",
+      });
+
+  String get transaction_feed => localize({
+        "pt-br": "Transações",
+        "en-us": "Transaction Feed",
+      });
+
+  String get change_name => localize({
+        "pt-br": "Alterar Nome",
+        "en-us": "Change Name",
+      });
+}
+
+class PageI18N {
+  String _language;
+
+  PageI18N(BuildContext context) {
+    this._language = BlocProvider.of<CurrentLocaleCubit>(context).state;
+  }
+
+  String localize(Map<String, String> values) {
+    return values[_language];
   }
 }
