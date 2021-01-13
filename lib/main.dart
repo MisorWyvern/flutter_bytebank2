@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
 import 'package:flutter_bytebank02/http/webclients/transaction_webclient.dart';
-import 'package:flutter_bytebank02/pages/dashboard_page.dart';
+import 'package:flutter_bytebank02/pages/dashboard/dashboard_container.dart';
 import 'package:flutter_bytebank02/widgets/app_dependencies.dart';
-import 'package:flutter_bytebank02/widgets/localization.dart';
+import 'package:flutter_bytebank02/widgets/localization/locale.dart';
 import 'package:flutter_bytebank02/widgets/theme.dart';
 
 void main() {

@@ -5,22 +5,9 @@ import 'package:flutter_bytebank02/models/cubits/name_cubit.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
 import 'package:flutter_bytebank02/pages/transactions_list.dart';
 import 'package:flutter_bytebank02/widgets/icon_labeled_container.dart';
-import 'package:flutter_bytebank02/widgets/localization.dart';
 
-import 'name_page.dart';
-
-class DashboardContainer extends BlocContainer {
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => NameCubit("Exemplo"),
-      child: I18NLoadingContainer(
-        pageKey: "dashboard",
-        creator: (messages) => DashboardPage(DashboardPageLazyI18N(messages)),
-      ),
-    );
-  }
-}
+import '../name_page.dart';
+import 'dashboard_lazy_i18n.dart';
 
 class DashboardPage extends StatelessWidget {
   final DashboardPageLazyI18N _i18n;
@@ -105,27 +92,3 @@ class DashboardPage extends StatelessWidget {
         .push(MaterialPageRoute(builder: (context) => TransactionsList()));
   }
 }
-
-class DashboardPageLazyI18N {
-  final I18NMessages _messages;
-  DashboardPageLazyI18N(this._messages);
-
-  String get transfer => _messages.get("transfer");
-
-  String get transactionFeed => _messages.get("transaction_feed");
-
-  String get changeName => _messages.get("change_name");
-}
-
-// ({
-//       "pt-br": "Transferência",
-//       "en-us": "Transfer",
-//     });
-//  localize({
-// "pt-br": "Transações",
-// "en-us": "Transaction Feed",
-//     });
-// localize({
-//       "pt-br": "Alterar Nome",
-//       "en-us": "Change Name",
-//     });

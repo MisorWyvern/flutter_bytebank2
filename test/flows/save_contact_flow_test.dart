@@ -3,7 +3,7 @@ import 'package:flutter_bytebank02/main.dart';
 import 'package:flutter_bytebank02/models/contact.dart';
 import 'package:flutter_bytebank02/pages/contact_form.dart';
 import 'package:flutter_bytebank02/pages/contact_list.dart';
-import 'package:flutter_bytebank02/pages/dashboard_page.dart';
+import 'package:flutter_bytebank02/pages/dashboard/dashboard_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 

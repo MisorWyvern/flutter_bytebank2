@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bytebank02/database/dao/contact_dao.dart';
-import 'package:flutter_bytebank02/pages/dashboard_page.dart';
+import 'package:flutter_bytebank02/pages/dashboard/dashboard_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../matchers/matchers.dart';
