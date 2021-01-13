@@ -59,7 +59,7 @@ void main() {
 Future _pumpDashboard(WidgetTester widgetTester, ContactDAO contactDAO) async {
   await widgetTester.pumpWidget(
     MaterialApp(
-      home: DashboardPage(),
+      home: DashboardPage(null),
     ),
   );
 }

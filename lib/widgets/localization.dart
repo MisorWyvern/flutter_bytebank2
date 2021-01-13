@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bytebank02/http/webclients/i18n_webclient.dart';
 import 'package:flutter_bytebank02/models/bloc_container.dart';
 import 'package:flutter_bytebank02/pages/alert_page.dart';
 import 'package:flutter_bytebank02/pages/progress_indicator_page.dart';
@@ -66,18 +67,20 @@ class I18NLoadingPage extends StatelessWidget {
 typedef Widget I18NWidgetCreator(I18NMessages messages);
 
 class I18NLoadingContainer extends StatelessWidget {
-  final I18NWidgetCreator _creator;
+  final I18NWidgetCreator creator;
+  final String pageKey;
 
-  const I18NLoadingContainer(this._creator);
+  const I18NLoadingContainer({@required this.pageKey, @required this.creator});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
         final cubit = I18NMessagesCubit();
-        cubit.reload();
+        cubit.reload(I18NWebClient(pageKey));
         return cubit;
       },
-      child: I18NLoadingPage(_creator),
+      child: I18NLoadingPage(creator),
     );
   }
 }
@@ -85,25 +88,20 @@ class I18NLoadingContainer extends StatelessWidget {
 class I18NMessagesCubit extends Cubit<I18NMessagesState> {
   I18NMessagesCubit() : super(InitI18NMessagesState());
 
-  reload() async {
+  reload(I18NWebClient webClient) async {
     emit(LoadingI18NMessagesState());
-    await Future.delayed(Duration(seconds: 3));
-    emit(
-      LoadedI18NMessagesState(
-        I18NMessages(
-          {
-            "transfer": "Transfer",
-            "transaction_feed": "Transaction Feed",
-            "change_name": "Change Name",
-          },
-        ),
-      ),
-    );
+    webClient.findAll().then(
+          (messages) => emit(
+            LoadedI18NMessagesState(
+              I18NMessages(messages),
+            ),
+          ),
+        );
   }
 }
 
 class I18NMessages {
-  final Map<String, String> _messages;
+  final Map<String, dynamic> _messages;
 
   I18NMessages(this._messages);
 
